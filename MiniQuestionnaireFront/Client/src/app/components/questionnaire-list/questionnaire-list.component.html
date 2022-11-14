@@ -1,0 +1,34 @@
+<br><br><br>
+<div style="position: relative; display: flex; justify-content: center">
+  <h2 style="text-align: center; display: inline-block">Questionnaires</h2>
+</div>
+
+<div style=" position: relative; width: 100%; right: -603px" >
+  <br>
+  <table class="table" style="display: inline-block">
+    <thead>
+    <tr>
+      <th>Number</th>
+      <th>Questionnaire name</th>
+      <th *ngIf="user.role == 1">Edit</th>
+      <th *ngIf="user.role == 1">Delete</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let questionnaire of questionnaires; let i = index">
+      <td>{{i + 1}}</td>
+      <td>{{questionnaire.name}}</td>
+      <td *ngIf="user.role == 1">
+        <button mat-icon-button [routerLink]="['update',questionnaire.id]">
+          <mat-icon>edit</mat-icon>
+        </button>
+      </td>
+      <td *ngIf="user.role == 1">
+        <button mat-icon-button (click)="delete(questionnaire)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>
