@@ -3,8 +3,7 @@
   <h2 style="text-align: center; display: inline-block">Questionnaires</h2>
 </div>
 
-<div style=" position: relative; width: 100%; right: -603px" >
-  <br>
+<div style=" position: relative; width: 100%; right: -560px">
   <table class="table" style="display: inline-block">
     <thead>
     <tr>
@@ -17,7 +16,7 @@
     <tbody>
     <tr *ngFor="let questionnaire of questionnaires; let i = index">
       <td>{{i + 1}}</td>
-      <td>{{questionnaire.name}}</td>
+      <td><button mat-button [routerLink]="['fill',questionnaire.id]">{{questionnaire.name}}</button></td>
       <td *ngIf="user.role == 1">
         <button mat-icon-button [routerLink]="['update',questionnaire.id]">
           <mat-icon>edit</mat-icon>

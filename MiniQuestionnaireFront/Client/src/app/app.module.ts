@@ -19,6 +19,7 @@ import {authErrorInterceptorProviders} from "./helper/error-interceptor.service"
 import { QuestionnaireAddComponent } from './components/questionnaire-add/questionnaire-add.component';
 import {MatTooltipModule} from "@angular/material/tooltip";
 import { QuestionnaireUpdateComponent } from './components/questionnaire-update/questionnaire-update.component';
+import { QuestionnaireFillComponent } from './components/questionnaire-fill/questionnaire-fill.component';
 
 @NgModule({
   declarations: [
@@ -28,7 +29,8 @@ import { QuestionnaireUpdateComponent } from './components/questionnaire-update/
     RegisterComponent,
     QuestionnaireListComponent,
     QuestionnaireAddComponent,
-    QuestionnaireUpdateComponent
+    QuestionnaireUpdateComponent,
+    QuestionnaireFillComponent
   ],
     imports: [
         BrowserModule,
