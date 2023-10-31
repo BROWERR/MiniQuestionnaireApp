@@ -1,0 +1,9 @@
+<div class="up">
+  <h2>Users who have filled out this questionnaire</h2>
+  <br><button mat-flat-button color="primary" (click)="back()">Back</button>
+</div>
+<div style="text-align: center;">
+  <a *ngFor="let user of user; let i = index" [routerLink]="[user.id]">
+    {{user.username}}
+  </a>
+</div>

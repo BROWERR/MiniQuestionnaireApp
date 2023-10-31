@@ -1,0 +1,29 @@
+<div class="up">
+  <h2>Fill Questionnaire</h2>
+  <br><button mat-flat-button color="primary" (click)="back()">Back</button>
+</div>
+<h2 style="text-align: center">{{allWhole.questionnaire.name}}</h2>
+
+<div *ngFor="let question of allWhole.questions; let i = index " style="text-align: center;">
+
+  <div *ngIf="question.answer_options == 0">
+    <mat-form-field appearance="fill">
+      <mat-label>{{question.questionTitle}}</mat-label>
+      <mat-select >
+        <mat-option *ngFor="let answer of allWhole.questions[i].answers" [value]="answer">
+          {{answer.answer}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <div *ngIf="question.answer_options == 1">
+    <mat-form-field appearance="fill">
+      <mat-label>{{question.questionTitle}}</mat-label>
+      <mat-select multiple [(value)]="answerD">
+        <mat-option *ngFor="let answer of allWhole.questions[i].answers" [value]="answer">{{answer.answer}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+  <button mat-button color="primary" (click)="submit()">Submit</button>
+</div>

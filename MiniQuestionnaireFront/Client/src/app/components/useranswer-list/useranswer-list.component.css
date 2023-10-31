@@ -1,0 +1,19 @@
+
+.about-page{
+  text-align: center;
+}
+
+.up{
+  display: flex;
+  align-items: center;
+  margin-top: 60px;
+}
+.up h2{
+  text-align: center;
+  margin-left:  38%;
+
+}
+.up button{
+  margin: 0 373px 0 auto
+}
+

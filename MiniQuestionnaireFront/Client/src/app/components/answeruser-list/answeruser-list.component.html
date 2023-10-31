@@ -1,0 +1,4 @@
+<h2>{{whole.questionnaire.name}}</h2>
+<div *ngFor="let q of whole.questions">
+  <p>{{q.questionTitle}} : {{q.answers[0].answer}}</p>
+</div>

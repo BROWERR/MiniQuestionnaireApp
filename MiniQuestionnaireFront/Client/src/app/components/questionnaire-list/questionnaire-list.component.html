@@ -1,0 +1,48 @@
+<br><br><br>
+<div style="position: relative; display: flex; justify-content: center">
+  <h2 style="text-align: center; display: inline-block">Questionnaires</h2>
+</div>
+
+<div style=" position: relative; width: 100%; right: -560px">
+  <table class="table" style="display: inline-block" *ngIf="user.role == 0">
+    <thead>
+    <tr>
+      <th>Number</th>
+      <th>Questionnaire name</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let questionnaire of questionnaires; let i = index">
+      <td>{{i + 1}}</td>
+      <td><button mat-button [routerLink]="['fill',questionnaire.id]">{{questionnaire.name}}</button></td>
+    </tr>
+    </tbody>
+  </table>
+
+  <table class="table" style="display: inline-block" *ngIf="user.role == 1">
+    <thead>
+    <tr>
+      <th>Number</th>
+      <th>Questionnaire name</th>
+      <th>Edit</th>
+      <th>Delete</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let questionnaire of questionnaires; let i = index">
+      <td>{{i + 1}}</td>
+      <td><button mat-button [routerLink]="['useranswer',questionnaire.id]">{{questionnaire.name}}</button></td>
+      <td>
+        <button mat-icon-button [routerLink]="['update',questionnaire.id]">
+          <mat-icon>edit</mat-icon>
+        </button>
+      </td>
+      <td>
+        <button mat-icon-button (click)="delete(questionnaire)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>

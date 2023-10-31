@@ -1,0 +1,63 @@
+<div class="up">
+  <h2>Update Questionnaire</h2>
+  <br><button mat-flat-button color="primary" (click)="back()">Back</button>
+</div>
+<form [formGroup]="updateForm" novalidate style="text-align: center ;">
+  <div>
+    <mat-form-field appearance="outline">
+      <mat-label>Enter questionnaire name</mat-label>
+      <input matInput ngModel="{{updateWhole.questionnaire.name}}"
+             formControlName="questionnaireName">
+    </mat-form-field>
+  </div>
+  <div formArrayName="questions">
+    <div class="question-container" *ngFor="let question of getQuestions(updateForm); let i = index">
+      <div class="ui raised segments" [formGroupName]="i">
+        <hr style="width: 725px; height: 2px; background-color: black">
+        <div class="question" style="position: relative" >
+          <h3 style="display: inline-block;">Question №{{i+1}}</h3>
+        </div>
+
+        <div>
+          <mat-form-field appearance="outline">
+            <mat-label>One answer option\Multiple answer options</mat-label>
+            <mat-select formControlName="answer_options">
+              <mat-option [value]=0>One</mat-option>
+              <mat-option [value]=1>Multiple</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Enter question</mat-label>
+          <input matInput ngModel="{{updateWhole.questions[i].questionTitle}}"
+                 formControlName="questionTitle">
+        </mat-form-field>
+
+        <div class="answer-container" formArrayName="answers">
+          <div [formGroupName]="j" *ngFor="let answer of getAnswers(question); let j = index">
+            <div style="position: relative">
+              <h3 style="display: inline-block;">Answer №{{i+1}}.{{j+1}}</h3>
+            </div>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Enter answer</mat-label>
+              <input matInput
+                     ngModel="{{updateWhole.questions[i].answers[j].answer}}"
+                     formControlName="answerTitle">
+            </mat-form-field>
+            <div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div><br><br>
+  <button style="width: 20%"  [disabled]="updateForm.invalid" mat-flat-button color="primary"
+      (click)="update()">
+    Update Questionnaire
+  </button>
+  <br><br><br>
+</form>
+
