@@ -6,6 +6,6 @@ import lombok.Data;
 @Data
 public class AllWholeDTO {
     private Long id;
-    private Questionnaire questionnaire;
+    private QuestionnaireDTO questionnaire;
     private QuestionToServer[] questions;
 }

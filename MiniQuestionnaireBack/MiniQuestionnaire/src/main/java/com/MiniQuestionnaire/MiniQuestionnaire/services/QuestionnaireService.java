@@ -12,6 +12,7 @@ import com.MiniQuestionnaire.MiniQuestionnaire.repository.AnswerRepository;
 import com.MiniQuestionnaire.MiniQuestionnaire.repository.QuestionRepository;
 import com.MiniQuestionnaire.MiniQuestionnaire.repository.QuestionnaireRepository;
 import com.MiniQuestionnaire.MiniQuestionnaire.repository.UserAnswerRepository;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -42,8 +43,19 @@ public class QuestionnaireService {
                 .collect(Collectors.toList());
     }
 
-    public void addQuestionnaire(AllWholeDTO allWholeDTO) {
-        questionnaireRepository.save(allWholeDTO.getQuestionnaire());
+    /**
+     * *
+     * Добавление анкеты
+     *
+     * @param allWholeDTO DTO-объект анкеты, которую нужно добавить в БД
+     */
+    @SneakyThrows
+    public String addQuestionnaire(AllWholeDTO allWholeDTO) {
+        if (allWholeDTO == null ||
+                questionnaireRepository.findQuestionnaireByName(allWholeDTO.getQuestionnaire().getName()) != null) {
+            return null;
+        }
+        questionnaireRepository.save(questionnaireMapper.toQuestionnaire(allWholeDTO.getQuestionnaire()));
         Questionnaire questionnaire = questionnaireRepository.findQuestionnaireByName(allWholeDTO.getQuestionnaire().getName());
         for (int i = 0; i < allWholeDTO.getQuestions().length; i++) {
             Question newQuestion = new Question(
@@ -51,59 +63,80 @@ public class QuestionnaireService {
                     allWholeDTO.getQuestions()[i].getAnswer_options(),
                     questionnaire
             );
-            questionService.addQuestion(newQuestion);
+            if (questionService.addQuestion(newQuestion) == null) {
+                return null;
+            }
             Question question = questionRepository.findQuestionByQuestion(newQuestion.getQuestion());
             for (int j = 0; j < allWholeDTO.getQuestions()[i].getAnswers().length; j++) {
                 Answer answer = new Answer(
                         allWholeDTO.getQuestions()[i].getAnswers()[j].getAnswer(),
                         question
                 );
-                answerService.addAnswer(answer);
+                if (answerService.addAnswer(answer) == null) {
+                    return null;
+                }
             }
         }
+        return "Questionnaire was successfully added";
     }
 
+    /**
+     * *
+     * Получение всей информации об анкете
+     *
+     * @param id id анкеты
+     * @return анкета
+     */
+    @SneakyThrows
     public AllWholeDTO getQuestionnaireById(Long id) {
         AllWholeDTO questionnaire = new AllWholeDTO();
         questionnaire.setId(id);
-        questionnaire.setQuestionnaire(questionnaireRepository.findById(id).orElseThrow());
+        questionnaire.setQuestionnaire(questionnaireMapper.toQuestionnaireDTO(questionnaireRepository.findById(id).orElseThrow()));
         List<Question> questions = questionRepository.findAllByQuestionnaire(questionnaireRepository.
                 findById(id).orElseThrow());
         List<Answer> answers;
-        QuestionToServer[] questionsToClient = new QuestionToServer[questions.size()];
-        AnswerDTO[] updateAnswers;
-        for (int i = 0; i < questionsToClient.length; i++) {
-            questionsToClient[i] = new QuestionToServer();
-            questionsToClient[i].setId(questions.get(i).getId());
-            questionsToClient[i].setAnswer_options(questions.get(i).getAnswer_options());
-            questionsToClient[i].setQuestionTitle(questions.get(i).getQuestion());
+        List<QuestionToServer> questionsToClient = new ArrayList<>();
+        List<AnswerDTO> updateAnswers = new ArrayList<>();
+        for (int i = 0; i < questions.size(); i++) {
+            questionsToClient.add(new QuestionToServer());
+            questionsToClient.get(i).setId(questions.get(i).getId());
+            questionsToClient.get(i).setAnswer_options(questions.get(i).getAnswer_options());
+            questionsToClient.get(i).setQuestionTitle(questions.get(i).getQuestion());
             answers = answerRepository.findAllByQuestion(questions.get(i));
-            updateAnswers = new AnswerDTO[answers.size()];
+
             for (int j = 0; j < answers.size(); j++) {
-                updateAnswers[j] = new AnswerDTO();
-                updateAnswers[j].setId(answers.get(j).getId());
-                updateAnswers[j].setAnswer(answers.get(j).getAnswer());
+                updateAnswers.add(new AnswerDTO());
+                updateAnswers.get(j).setId(answers.get(j).getId());
+                updateAnswers.get(j).setAnswer(answers.get(j).getAnswer());
             }
-            questionsToClient[i].setAnswers(updateAnswers);
+            questionsToClient.get(i).setAnswers(updateAnswers.stream().toArray(AnswerDTO[]::new));
         }
-        questionnaire.setQuestions(questionsToClient);
+        questionnaire.setQuestions(questionsToClient.stream().toArray(QuestionToServer[]::new));
         return questionnaire;
     }
 
+    /**
+     * *
+     * Получение анкеты с ответами пользователя
+     *
+     * @param id     id анкеты, на основе которого будет формироваться DTO
+     * @param idUser id пользователя, ответы которого нужно получить
+     * @return DTO-объект, содержащий анкету с вопросами и ответами пользователя с idUser
+     */
     public AllWholeDTO getQuestionnaireAnswerById(Long id, Long idUser) {
         AllWholeDTO questionnaire = new AllWholeDTO();
         questionnaire.setId(id);
-        questionnaire.setQuestionnaire(questionnaireRepository.findById(id).orElseThrow());
+        questionnaire.setQuestionnaire(questionnaireMapper.toQuestionnaireDTO(questionnaireRepository.findById(id).orElseThrow()));
         List<Question> questions = questionRepository.findAllByQuestionnaire(questionnaireRepository.
                 findById(id).orElseThrow());
         List<Answer> answers;
-        QuestionToServer[] questionsToClient = new QuestionToServer[questions.size()];
-        AnswerDTO[] updateAnswers;
-        for (int i = 0; i < questionsToClient.length; i++) {
-            questionsToClient[i] = new QuestionToServer();
-            questionsToClient[i].setId(questions.get(i).getId());
-            questionsToClient[i].setAnswer_options(questions.get(i).getAnswer_options());
-            questionsToClient[i].setQuestionTitle(questions.get(i).getQuestion());
+        List<QuestionToServer> questionsToClient = new ArrayList<>();
+        List<AnswerDTO> updateAnswers = new ArrayList<>();
+        for (int i = 0; i < questions.size(); i++) {
+            questionsToClient.add(new QuestionToServer());
+            questionsToClient.get(i).setId(questions.get(i).getId());
+            questionsToClient.get(i).setAnswer_options(questions.get(i).getAnswer_options());
+            questionsToClient.get(i).setQuestionTitle(questions.get(i).getQuestion());
 
             answers = answerRepository.findAllByQuestion(questions.get(i));
             List<Answer> userAnswers = new ArrayList<>();
@@ -113,41 +146,59 @@ public class QuestionnaireService {
                             .get(0).getAnswer());
             }
 
-            updateAnswers = new AnswerDTO[userAnswers.size()];
             for (int j = 0; j < userAnswers.size(); j++) {
-                updateAnswers[j] = new AnswerDTO();
-                updateAnswers[j].setId(userAnswers.get(j).getId());
-                updateAnswers[j].setAnswer(userAnswers.get(j).getAnswer());
+                updateAnswers.add(new AnswerDTO());
+                updateAnswers.get(j).setId(userAnswers.get(j).getId());
+                updateAnswers.get(j).setAnswer(userAnswers.get(j).getAnswer());
             }
-            questionsToClient[i].setAnswers(updateAnswers);
+            questionsToClient.get(i).setAnswers(updateAnswers.stream().toArray(AnswerDTO[]::new));
         }
-        questionnaire.setQuestions(questionsToClient);
+        questionnaire.setQuestions(questionsToClient.stream().toArray(QuestionToServer[]::new));
         return questionnaire;
     }
 
+    @SneakyThrows
     public void deleteQuestionnaireById(Long id) {
         questionnaireRepository.delete(questionnaireRepository.findById(id).orElseThrow());
     }
 
-    public void updateQuestionnaire(AllWholeDTO allWholeDTO) {
+    /**
+     * *
+     *
+     * @param allWholeDTO DTO-объект анкеты, которую нужно обновить
+     *                    в DTO находятся анкета, вопросы, ответы
+     */
+    @SneakyThrows
+    public String updateQuestionnaire(AllWholeDTO allWholeDTO) {
+        if (questionnaireRepository.findQuestionnaireByName(allWholeDTO.getQuestionnaire().getName()) != null) {
+            return null;
+        }
         Questionnaire updateQuestionnaire = questionnaireRepository.findById(
                 allWholeDTO.getQuestionnaire().getId()).orElseThrow();
         updateQuestionnaire.setName(allWholeDTO.getQuestionnaire().getName());
         questionnaireRepository.save(updateQuestionnaire);
 
-        List<Question> updateQuestions = questionRepository.findAllByQuestionnaire(allWholeDTO.getQuestionnaire());
+        List<Question> updateQuestions = questionRepository.findAllByQuestionnaire(questionnaireMapper.
+                toQuestionnaire(allWholeDTO.getQuestionnaire()));
         List<Answer> updateAnswers;
         for (int i = 0; i < updateQuestions.size(); i++) {
+            if (questionRepository.findQuestionByQuestion(updateQuestions.get(i).getQuestion()) != null){
+                return null;
+            }
             updateQuestions.get(i).setQuestion(allWholeDTO.getQuestions()[i].getQuestionTitle());
             updateQuestions.get(i).setAnswer_options(allWholeDTO.getQuestions()[i].getAnswer_options());
             updateQuestions.get(i).setQuestionnaire(updateQuestionnaire);
             questionRepository.save(updateQuestions.get(i));
             updateAnswers = answerRepository.findAllByQuestion(updateQuestions.get((i)));
             for (int j = 0; j < updateAnswers.size(); j++) {
+                if(answerRepository.findByAnswer(updateAnswers.get(j).getAnswer()) != null){
+                    return null;
+                }
                 updateAnswers.get(j).setAnswer(allWholeDTO.getQuestions()[i].getAnswers()[j].getAnswer());
                 updateAnswers.get(j).setQuestion(updateQuestions.get(i));
                 answerRepository.save(updateAnswers.get(j));
             }
         }
+        return "Questionnaire was successfully updated";
     }
 }

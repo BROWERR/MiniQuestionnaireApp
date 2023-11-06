@@ -4,6 +4,8 @@ import com.MiniQuestionnaire.MiniQuestionnaire.dto.AllWholeDTO;
 import com.MiniQuestionnaire.MiniQuestionnaire.dto.QuestionnaireDTO;
 import com.MiniQuestionnaire.MiniQuestionnaire.services.QuestionnaireService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,28 +21,36 @@ public class QuestionnaireController {
         return questionnaireService.getAllQuestionnaires();
     }
 
-    @PostMapping("/questionnaire/add")
-    public void addQuestionnaire(@RequestBody AllWholeDTO allWholeDTO){
-        questionnaireService.addQuestionnaire(allWholeDTO);
+    @PostMapping("/admin/questionnaire/add")
+    public ResponseEntity<String> addQuestionnaire(@RequestBody AllWholeDTO allWholeDTO){
+        String s = questionnaireService.addQuestionnaire(allWholeDTO);
+        if(s == null){
+            return new ResponseEntity<>("Error",HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(s, HttpStatus.OK);
     }
 
     @GetMapping("/questionnaire/{id}")
-    public AllWholeDTO getQuestionnaireById(@PathVariable(value ="id") long id){
-        return questionnaireService.getQuestionnaireById(id);
+    public ResponseEntity<AllWholeDTO> getQuestionnaireById(@PathVariable(value ="id") long id){
+        return new ResponseEntity<>(questionnaireService.getQuestionnaireById(id), HttpStatus.OK);
     }
 
     @GetMapping("/questionnaire/{id}/{idUser}")
-    public AllWholeDTO getQuestionnaireById(@PathVariable(value ="id") long id,@PathVariable(value ="idUser") long idUser){
-        return questionnaireService.getQuestionnaireAnswerById(id, idUser);
+    public ResponseEntity<AllWholeDTO> getQuestionnaireById(@PathVariable(value ="id") long id,@PathVariable(value ="idUser") long idUser){
+        return new ResponseEntity<>(questionnaireService.getQuestionnaireAnswerById(id, idUser), HttpStatus.OK);
     }
 
-    @PostMapping("/questionnaire/delete/{id}")
+    @PostMapping("/admin/questionnaire/delete/{id}")
     public void deleteQuestionnaire(@PathVariable(value = "id") long id) {
         questionnaireService.deleteQuestionnaireById(id);
     }
 
-    @PostMapping("/questionnaire/update")
-    public void updateQuestionnaire(@RequestBody AllWholeDTO allWholeDTO){
-        questionnaireService.updateQuestionnaire(allWholeDTO);
+    @PostMapping("/admin/questionnaire/update")
+    public ResponseEntity<String> updateQuestionnaire(@RequestBody AllWholeDTO allWholeDTO){
+        String s = questionnaireService.updateQuestionnaire(allWholeDTO);
+        if(s == null){
+            return new ResponseEntity<>("Error",HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(s, HttpStatus.OK);
     }
 }

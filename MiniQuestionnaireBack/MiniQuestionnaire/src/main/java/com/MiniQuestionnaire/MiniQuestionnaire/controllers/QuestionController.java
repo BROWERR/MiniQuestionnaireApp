@@ -3,6 +3,8 @@ package com.MiniQuestionnaire.MiniQuestionnaire.controllers;
 import com.MiniQuestionnaire.MiniQuestionnaire.dto.QuestionDTO;
 import com.MiniQuestionnaire.MiniQuestionnaire.services.QuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,16 +26,16 @@ public class QuestionController {
     }
 
     @GetMapping("/question/{id}")
-    public QuestionDTO getQuestionById(@PathVariable(value ="id") long id){
-        return questionService.getQuestionById(id);
+    public ResponseEntity<QuestionDTO> getQuestionById(@PathVariable(value ="id") long id){
+        return new ResponseEntity<>(questionService.getQuestionById(id), HttpStatus.OK);
     }
 
-    @PostMapping("/question/delete/{id}")
+    @PostMapping("/admin/question/delete/{id}")
     public void deleteQuestion(@PathVariable(value = "id") long id) {
         questionService.deleteQuestionById(id);
     }
 
-    @PostMapping("/question/update")
+    @PostMapping("/admin/question/update")
     public void updateQuestion(@RequestBody QuestionDTO questionDTO){
         questionService.updateQuestion(questionDTO);
     }

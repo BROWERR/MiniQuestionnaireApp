@@ -4,7 +4,7 @@ import {Observable} from "rxjs";
 import {Questionnaire} from "../models/questionnaire";
 import {Allwhole} from "../models/allwhole";
 
-const QUESTIONNAIRE_API = 'http://localhost:8080/questionnaire/';
+const QUESTIONNAIRE_API = 'http://localhost:8080/';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +14,7 @@ export class QuestionnaireService {
   constructor(private http: HttpClient) { }
 
   getAllQuestionnaires() : Observable<any>{
-    return this.http.get(QUESTIONNAIRE_API+'all');
+    return this.http.get(QUESTIONNAIRE_API + 'questionnaire/all');
   }
 
   /*createQuestionnaire(questionnaire: Questionnaire) : Observable<any>{
@@ -22,7 +22,7 @@ export class QuestionnaireService {
   }*/
 
   updateQuestionnaire(questionnaire: Allwhole) : Observable<any>{
-    return this.http.post(QUESTIONNAIRE_API+'update',questionnaire);
+    return this.http.post(QUESTIONNAIRE_API+'admin/questionnaire/update',questionnaire);
   }
 
   getQuestionnaireById(id:number) : Observable<any>{
@@ -34,10 +34,10 @@ export class QuestionnaireService {
   }
 
   deleteQuestionnaire(id: number | undefined):Observable<any>{
-    return this.http.post(QUESTIONNAIRE_API+'delete/'+id,null);
+    return this.http.post(QUESTIONNAIRE_API+'admin/questionnaire/delete/'+id,null);
   }
 
   createAll(all: Allwhole): Observable<any>{
-    return this.http.post(QUESTIONNAIRE_API+'add',all);
+    return this.http.post(QUESTIONNAIRE_API+'admin/questionnaire/add',all);
   }
 }

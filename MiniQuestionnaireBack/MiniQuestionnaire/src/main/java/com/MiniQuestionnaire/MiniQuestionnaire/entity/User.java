@@ -1,11 +1,14 @@
 package com.MiniQuestionnaire.MiniQuestionnaire.entity;
 
+import com.MiniQuestionnaire.MiniQuestionnaire.entity.enums.EROLE;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @Entity
@@ -32,6 +35,9 @@ public class User implements UserDetails {
         this.role = role;
     }
 
+    @ElementCollection(targetClass = EROLE.class)
+    @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))
+    private Set<EROLE> roles = new HashSet<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

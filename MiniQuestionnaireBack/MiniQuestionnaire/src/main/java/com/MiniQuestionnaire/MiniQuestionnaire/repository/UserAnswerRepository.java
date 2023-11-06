@@ -13,4 +13,6 @@ public interface UserAnswerRepository extends JpaRepository<UserAnswer, Long> {
         List<UserAnswer> findUserAnswerByAnswerIdAndUserId(Long id, Long idUser);
 
         List<UserAnswer> findUserAnswerByAnswerId(Long id);
+
+        List<UserAnswer> findByAnswerIdIn(List<Long> answerId);
 }

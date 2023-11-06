@@ -3,6 +3,8 @@ package com.MiniQuestionnaire.MiniQuestionnaire.controllers;
 import com.MiniQuestionnaire.MiniQuestionnaire.dto.AnswerDTO;
 import com.MiniQuestionnaire.MiniQuestionnaire.services.AnswerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,16 +21,16 @@ public class AnswerController {
     }
 
     @GetMapping("/answer/{id}")
-    public AnswerDTO getAnswerById(@PathVariable(value ="id") long id){
-        return answerService.getAnswerById(id);
+    public ResponseEntity<AnswerDTO> getAnswerById(@PathVariable(value ="id") long id){
+        return new ResponseEntity<>(answerService.getAnswerById(id), HttpStatus.OK);
     }
 
-    @PostMapping("/answer/delete/{id}")
+    @PostMapping("/admin/answer/delete/{id}")
     public void deleteUserAnswer(@PathVariable(value = "id") long id) {
         answerService.deleteAnswerById(id);
     }
 
-    @PostMapping("/answer/update")
+    @PostMapping("/admin/answer/update")
     public void updateAnswer(@RequestBody AnswerDTO answerDTO){
         answerService.updateAnswer(answerDTO);
     }

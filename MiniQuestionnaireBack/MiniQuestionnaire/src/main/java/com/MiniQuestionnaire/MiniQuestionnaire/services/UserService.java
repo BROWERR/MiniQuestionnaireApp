@@ -4,6 +4,7 @@ import com.MiniQuestionnaire.MiniQuestionnaire.dto.UserDTO;
 import com.MiniQuestionnaire.MiniQuestionnaire.entity.Answer;
 import com.MiniQuestionnaire.MiniQuestionnaire.entity.Question;
 import com.MiniQuestionnaire.MiniQuestionnaire.entity.UserAnswer;
+import com.MiniQuestionnaire.MiniQuestionnaire.entity.enums.EROLE;
 import com.MiniQuestionnaire.MiniQuestionnaire.exceptions.UserExistException;
 import com.MiniQuestionnaire.MiniQuestionnaire.entity.User;
 import com.MiniQuestionnaire.MiniQuestionnaire.mapper.UserMapper;
@@ -46,39 +47,37 @@ public class UserService {
         this.userMapper = userMapper;
     }
 
-    public User getCurrentUser(Principal principal) {
-        return userRepository.findUserByUsername(principal.getName()).orElseThrow(() -> new UsernameNotFoundException(
-                "User not found with username:" + principal.getName()
-        ));
+    public UserDTO getCurrentUser(Principal principal) {
+        return userMapper.toUserDTO(userRepository.findUserByUsername(principal.getName()).orElseThrow(() ->
+                new UsernameNotFoundException("User not found with username:" + principal.getName()))
+        );
     }
 
-    public User getUserById(Long id) {
-        return userRepository.findUserById(id).orElseThrow(() -> new UsernameNotFoundException(
+    public UserDTO getUserById(Long id) {
+        return userMapper.toUserDTO(userRepository.findUserById(id).orElseThrow(() -> new UsernameNotFoundException(
                 "User not found"
-        ));
+        )));
     }
 
-    public UserDTO[] getListUsersById(Long id) {
+    public List<UserDTO> getListUsersById(Long id) {
         List<Question> listQuestions = questionRepository.findAllByQuestionnaireId(id);
-        List<Answer> listAnswers = new ArrayList<>();
-        for (int i = 0; i < listQuestions.size(); i++) {
-            List<Answer> an = answerRepository.findAllByQuestion(listQuestions.get(i));
-            listAnswers.addAll(an);
-            an = null;
+        List<Answer> listAnswers = answerRepository.findByQuestionIn(listQuestions);
+        List<Long> answerId = new ArrayList<>();
+        for (int i = 0; i < listAnswers.size(); i++) {
+            answerId.add(listAnswers.get(i).getId());
         }
         List<User> listUser = new ArrayList<>();
+        List<UserAnswer> usr = userAnswerRepository.findByAnswerIdIn(answerId);
         for (int i = 0; i < listAnswers.size(); i++) {
-            List<UserAnswer> usr = userAnswerRepository.findUserAnswerByAnswerId(listAnswers.get(i).getId());
             for (int j = 0; j < usr.size(); j++) {
                 listUser.add(usr.get(j).getUser());
             }
-            usr = null;
         }
 
         Set<UserDTO> userSet = listUser.stream().map(userMapper::toUserDTO)
                 .collect(Collectors.toSet());
 
-        return userSet.stream().toArray(UserDTO[]::new);
+        return new ArrayList<>(userSet);
     }
 
     public void createUser(SignupRequest userIn) {
@@ -86,6 +85,7 @@ public class UserService {
         user.setUsername(userIn.getUsername());
         user.setPassword(passwordEncoder.encode(userIn.getPassword()));
         user.setRole(0);
+        user.getRoles().add(EROLE.ROLE_USER);
 
         try {
             LOG.info("Saving User {}", userIn.getUsername());

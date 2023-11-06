@@ -21,7 +21,7 @@ export class AnswerService {
   }
 
   updateAnswer(answer: AnswerDTO) : Observable<any>{
-    return this.http.post(ANSWER_API+'update',answer);
+    return this.http.post('http://localhost:8080/admin/answer/'+'update',answer);
   }
 
   getAnswerById(id:number) : Observable<any>{
@@ -29,6 +29,6 @@ export class AnswerService {
   }
 
   deleteAnswer(id: number | undefined):Observable<any>{
-    return this.http.post(ANSWER_API+'delete/'+id,null);
+    return this.http.post('http://localhost:8080/admin/answer/'+'delete/'+id,null);
   }
 }

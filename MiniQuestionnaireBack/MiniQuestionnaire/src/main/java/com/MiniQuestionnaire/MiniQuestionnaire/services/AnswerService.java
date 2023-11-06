@@ -4,6 +4,7 @@ import com.MiniQuestionnaire.MiniQuestionnaire.dto.AnswerDTO;
 import com.MiniQuestionnaire.MiniQuestionnaire.entity.Answer;
 import com.MiniQuestionnaire.MiniQuestionnaire.mapper.AnswerMapper;
 import com.MiniQuestionnaire.MiniQuestionnaire.repository.AnswerRepository;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,22 +24,40 @@ public class AnswerService {
                 .collect(Collectors.toList());
     }
 
-    public void addAnswer(Answer answer) {
+    /** **
+     * Добавление ответа на вопрос
+     * @param answer Ответ на вопрос анкеты
+     */
+    @SneakyThrows
+    public String addAnswer(Answer answer) {
+        if(answer == null || answerRepository.findByAnswer(answer.getAnswer()) != null){
+            return null;
+        }
         Answer newAnswer = new Answer(
                 answer.getAnswer(),
                 answer.getQuestion()
         );
         answerRepository.save(newAnswer);
+        return "Answer successfully added";
     }
 
+    /** **
+     * Получение ответа на вопрос по id
+     * @param id id ответа, который нужно получить
+     * @return  DTO-объект ответа
+     */
     public AnswerDTO getAnswerById(Long id) {
         return answerMapper.toAnswerDTO(answerRepository.findById(id).orElseThrow());
     }
-
+    @SneakyThrows
     public void deleteAnswerById(Long id) {
         answerRepository.delete(answerRepository.findById(id).orElseThrow());
     }
 
+    /** **
+     *
+     * @param answerDTO DTO объект ответа, который нужно обновить
+     */
     public void updateAnswer(AnswerDTO answerDTO) {
         Answer updateAnswer = answerRepository.findById(answerDTO.getId()).orElseThrow();
         updateAnswer.setAnswer(answerDTO.getAnswer());
